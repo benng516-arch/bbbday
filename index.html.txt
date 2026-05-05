@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Birthday Surprise for AJ Samuel</title>
+    
+    <!-- WhatsApp/WeChat 預覽優化 -->
+    <meta property="og:title" content="To: AJ Samuel - 一份閃亮的驚喜">
+    <meta property="og:description" content="來自 Rosen 的優雅祝福，請親自點擊開啟">
+    <meta property="og:image" content="cover.jpg">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #000; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, serif;
+        }
+
+        #container {
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 封面圖片樣式 */
+        #poster {
+            width: 90%;
+            max-height: 80%;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.5s ease;
+        }
+
+        /* 提示字體 */
+        #hint {
+            position: absolute;
+            bottom: 15%;
+            color: #D4AF37;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-align: center;
+            width: 100%;
+            z-index: 11;
+            pointer-events: none;
+            animation: blink 2s infinite;
+        }
+
+        /* 影片樣式 */
+        video {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 確保 CapCut 9:16 比例正確 */
+            z-index: 5;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* 載入中動畫 */
+        #loader {
+            display: none;
+            position: absolute;
+            color: white;
+            z-index: 12;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <!-- 封面 -->
+    <img src="cover.jpg" id="poster" alt="Birthday Cover" onclick="playSurprise()">
+    
+    <!-- 提示 -->
+    <div id="hint">TAP TO OPEN</div>
+    
+    <!-- 載入中 -->
+    <div id="loader">Loading your surprise...</div>
+
+    <!-- 影片：請確保檔案名稱為 card_video.mp4 -->
+    <video id="bdayVideo" playsinline webkit-playsinline>
+        <source src="card_video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+
+<script>
+    const video = document.getElementById('bdayVideo');
+    const poster = document.getElementById('poster');
+    const hint = document.getElementById('hint');
+    const loader = document.getElementById('loader');
+
+    // 預先載入影片
+    video.load();
+
+    function playSurprise() {
+        // 隱藏封面和提示，顯示載入文字
+        poster.style.display = 'none';
+        hint.style.display = 'none';
+        loader.style.display = 'block';
+
+        // 嘗試播放
+        const startVideo = () => {
+            loader.style.display = 'none';
+            video.style.display = 'block';
+            
+            // 處理瀏覽器播放權限
+            let playPromise = video.play();
+
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Playback failed, attempting muted play:", error);
+                    // 如果帶聲音播放失敗，嘗試靜音播放
+                    video.muted = true;
+                    video.play();
+                    // 提示用戶點擊開啟聲音
+                    alert("請點擊影片畫面以開啟聲音祝福！");
+                    video.onclick = () => { video.muted = false; };
+                });
+            }
+        };
+
+        // 確保影片數據已載入後才開始
+        if (video.readyState >= 3) {
+            startVideo();
+        } else {
+            video.oncanplay = () => {
+                startVideo();
+            };
+        }
+    }
+
+    // 針對微信或部分瀏覽器的適配
+    document.addEventListener("WeixinJSBridgeReady", function () {
+        video.load();
+    }, false);
+</script>
+
+</body>
+</html>
